@@ -56,19 +56,21 @@ class LoginActivity : ComponentActivity() {
                 LoginScreen(
                     viewModel = viewModel,
                     onLoginClick = { inputId, inputPwd ->
+                        val context = this
                         val trimmedId = inputId.trim()
                         val trimmedPwd = inputPwd.trim()
                         Log.d("Login", "Comparing: $trimmedId/${viewModel.savedUserId}, $trimmedPwd/${viewModel.savedPassword}")
                         when {
-                            trimmedId.isEmpty() || trimmedPwd.isEmpty() ->
-                                Toast.makeText(this, "아이디와 비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
-                            trimmedId == viewModel.savedUserId && trimmedPwd == viewModel.savedPassword -> {
-                                Toast.makeText(this, "로그인 성공!", Toast.LENGTH_SHORT).show()
-                                startActivity(Intent(this, MyActivity::class.java))
-                                finish()
+                            trimmedId.isEmpty() || trimmedPwd.isEmpty() -> {
+                                Toast.makeText(context, "아이디와 비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
                             }
-                            else ->
-                                Toast.makeText(this, "로그인 실패: 정보 불일치", Toast.LENGTH_SHORT).show()
+                            trimmedId == viewModel.savedUserId && trimmedPwd == viewModel.savedPassword -> {
+                                Toast.makeText(context, "로그인 성공!", Toast.LENGTH_SHORT).show()
+                                context.startActivity(Intent(context, MyActivity::class.java))
+                            }
+                            else -> {
+                                Toast.makeText(context, "로그인 실패: 정보 불일치", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     },
                     onSignupClick = {
@@ -185,7 +187,10 @@ fun LoginScreen(
                 Text(
                     text = "회원가입",
                     color = Color.Gray,
-                    modifier = Modifier.clickable { onSignupClick() }
+                    modifier = Modifier.clickable {
+                        val intent = Intent(context, SignupActivity::class.java)
+                        context.startActivity(intent)
+                    }
                 )
             }
         }
