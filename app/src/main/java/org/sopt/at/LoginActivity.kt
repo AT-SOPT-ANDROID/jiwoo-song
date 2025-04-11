@@ -86,6 +86,7 @@ class LoginActivity : ComponentActivity() {
 fun LoginScreen(
     viewModel: LoginViewModel,
     onLoginClick: (String, String) -> Unit,
+    onSignupClick: () -> Unit
 ) {
     var textId by remember { mutableStateOf("") }
     var textPwd by remember { mutableStateOf("") }
