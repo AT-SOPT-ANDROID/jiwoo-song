@@ -13,15 +13,28 @@
         android:theme="@style/Theme.ATSOPTANDROID"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name="org.sopt.atsoptandroid.LoginActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.ATSOPTANDROID">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="org.sopt.atsoptandroid.SignupActivity"
+            android:exported="true"
+            android:label="회원가입"
+            android:theme="@style/Theme.ATSOPTANDROID"
+            android:parentActivityName="org.sopt.atsoptandroid.LoginActivity">
+        </activity>
+        <activity
+            android:name="org.sopt.atsoptandroid.MyActivity"
+            android:exported="true"
+            android:label="마이페이지"
+            android:theme="@style/Theme.ATSOPTANDROID"
+            android:parentActivityName="org.sopt.atsoptandroid.LoginActivity">
         </activity>
     </application>
 
