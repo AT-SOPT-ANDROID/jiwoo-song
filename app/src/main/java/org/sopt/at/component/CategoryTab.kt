@@ -20,15 +20,19 @@ fun CategoryTab(modifier: Modifier = Modifier) {
     var selectedIndex by remember { mutableStateOf(0) }
 
     Row(
-        modifier = modifier.padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(20.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
+        horizontalArrangement = Arrangement.Center
     ) {
         categories.forEachIndexed { index, title ->
             Text(
                 text = title,
                 fontWeight = if (selectedIndex == index) FontWeight.Bold else FontWeight.Normal,
                 color = if (selectedIndex == index) Color.White else Color.Gray,
-                modifier = Modifier.clickable { selectedIndex = index }
+                modifier = Modifier
+                    .clickable { selectedIndex = index }
+                    .padding(horizontal = 12.dp)
             )
         }
     }

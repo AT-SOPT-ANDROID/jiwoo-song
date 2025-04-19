@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
@@ -19,7 +20,10 @@ import org.sopt.at.ui.theme.ATSOPTANDROIDTheme
 fun BottomNav() {
     var selectedTab by remember { mutableStateOf(0) }
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = Color.Black,
+        contentColor = Color.White
+    ) {
         NavigationBarItem(
             selected = selectedTab == 0,
             onClick = { selectedTab = 0 },
@@ -62,36 +66,36 @@ fun BottomNavPreview() {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             bottomBar = {
-                NavigationBar {
+                NavigationBar(containerColor = Color.Black) {
                     NavigationBarItem(
                         selected = selectedTab == 0,
                         onClick = { selectedTab = 0 },
                         icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-                        label = { Text("Home") }
+                        label = { Text("Home", fontSize = 10.sp, textAlign = TextAlign.Center, color = Color.White) }
                     )
                     NavigationBarItem(
                         selected = selectedTab == 1,
                         onClick = { selectedTab = 1 },
-                        icon = { Text("🎞") },
-                        label = { Text("Shorts") }
+                        icon = { Text("🎞", color = Color.White) },
+                        label = { Text("Shorts", color = Color.White) }
                     )
                     NavigationBarItem(
                         selected = selectedTab == 2,
                         onClick = { selectedTab = 2 },
-                        icon = { Text("📡") },
-                        label = { Text("Live") }
+                        icon = { Text("📡", color = Color.White) },
+                        label = { Text("Live", color = Color.White) }
                     )
                     NavigationBarItem(
                         selected = selectedTab == 3,
                         onClick = { selectedTab = 3 },
-                        icon = { Text("🔍") },
-                        label = { Text("Search") }
+                        icon = { Text("🔍", color = Color.White) },
+                        label = { Text("Search", color = Color.White) }
                     )
                     NavigationBarItem(
                         selected = selectedTab == 4,
                         onClick = { selectedTab = 4 },
-                        icon = { Text("🕓") },
-                        label = { Text("History") }
+                        icon = { Text("🕓", color = Color.White) },
+                        label = { Text("History", color = Color.White) }
                     )
                 }
             }

@@ -42,9 +42,9 @@
             android:exported="false"
             android:label="@string/title_activity_list"
             android:theme="@style/Theme.ATSOPTANDROID" />
-        <activity
-            android:name=".ui.theme.ListActivity"
-            android:exported="false" />
+<!--        <activity-->
+<!--            android:name=".ui.theme.ListActivity"-->
+<!--            android:exported="false" />-->
         <activity
             android:name="org.sopt.atsoptandroid.LoginActivity"
             android:exported="true"
