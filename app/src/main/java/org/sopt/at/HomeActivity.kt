@@ -158,6 +158,16 @@ fun BannerSection() {
 @Composable
 fun SectionWithRow(title: String) {
     val context = LocalContext.current
+    val imageList = if (title == "오늘의 티빙 TOP 20") {
+        emptyList()
+    } else {
+        listOf(
+            R.drawable.img_01, R.drawable.img_02, R.drawable.img_03, R.drawable.img_04, R.drawable.img_05,
+            R.drawable.img_06, R.drawable.img_07, R.drawable.img_08, R.drawable.img_09, R.drawable.img_10,
+            R.drawable.img_11, R.drawable.img_12, R.drawable.img_13, R.drawable.img_14, R.drawable.img_15,
+            R.drawable.img_16, R.drawable.img_17, R.drawable.img_18, R.drawable.img_19, R.drawable.img_20
+        ).shuffled().take(10)  //랜덤하게 10개 보여주기
+    }
     Column(modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -168,8 +178,8 @@ fun SectionWithRow(title: String) {
             Text(text = "더보기", modifier = Modifier.padding(end = 16.dp), color = Color.White)
         }
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(20) { index ->
-                if (title == "오늘의 티빙 TOP 20") {
+            if (title == "오늘의 티빙 TOP 20") {
+                items(20) { index ->
                     val resId = when (index + 1) {
                         1 -> R.drawable.img_01
                         2 -> R.drawable.img_02
@@ -203,7 +213,7 @@ fun SectionWithRow(title: String) {
                                 fontStyle = FontStyle.Italic,
                                 modifier = Modifier
                                     .padding(end = 4.dp)
-                                    .offset(y = (15).dp)
+                                    .offset(y = (40).dp)
                             )
                             Image(
                                 painter = painterResource(id = resId),
@@ -213,15 +223,10 @@ fun SectionWithRow(title: String) {
                             )
                         }
                     }
-                } else {
-                    val imageList = listOf(
-                        R.drawable.img_01, R.drawable.img_02, R.drawable.img_03, R.drawable.img_04, R.drawable.img_05,
-                        R.drawable.img_06, R.drawable.img_07, R.drawable.img_08, R.drawable.img_09, R.drawable.img_10,
-                        R.drawable.img_11, R.drawable.img_12, R.drawable.img_13, R.drawable.img_14, R.drawable.img_15,
-                        R.drawable.img_16, R.drawable.img_17, R.drawable.img_18, R.drawable.img_19, R.drawable.img_20
-                    ).shuffled().take(10)  //랜덤하게 10개 보여주기
-
-                    val imageResId = imageList.getOrNull(index % 10) ?: android.R.drawable.ic_menu_gallery
+                }
+            } else {
+                items(imageList.size) { index ->
+                    val imageResId = imageList.getOrNull(index) ?: android.R.drawable.ic_menu_gallery
                     Image(
                         painter = painterResource(id = imageResId),
                         contentDescription = null,
