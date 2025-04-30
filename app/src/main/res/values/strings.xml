@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">AT SOPT ANDROID</string>
+    <string name="title_activity_list">ListActivity</string>
+    <string name="title_activity_custom">CustomActivity</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_activity_top_bar">TopBar</string>
+    <string name="title_activity_bottom_nav">BottomNav</string>
+    <string name="title_activity_shorts_screen">ShortsScreen</string>
+    <string name="title_activity_live_screen">LiveScreen</string>
+    <string name="title_activity_search_screen">SearchScreen</string>
+    <string name="title_activity_history_screen">HistoryScreen</string>
+    <string name="title_activity_home_screen">HomeScreen</string>
 </resources>
