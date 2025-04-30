@@ -30,10 +30,13 @@ import org.sopt.at.component.BottomNav
 import org.sopt.at.component.CategoryTab
 import org.sopt.at.ui.theme.ATSOPTANDROIDTheme
 import org.sopt.atsoptandroid.MyActivity
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavHostController
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontStyle
+import org.sopt.at.navigation.NavGraph
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,47 +77,25 @@ fun TvingTopBar() {
     )
 }
 
-class HomeActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            ATSOPTANDROIDTheme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    containerColor = Color.Black,
-                    bottomBar = { BottomNav() }
-                ) { innerPadding ->
-                    CompositionLocalProvider(LocalContentColor provides Color.White) {
-                        HomeScreen(
-                            modifier = Modifier.padding(innerPadding)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        item { TvingTopBar() }
-        stickyHeader {
-            Surface(color = Color.Black) {
-                CategoryTab()
+fun HomeScreenWrapper() {
+    val navController = rememberNavController()
+
+    ATSOPTANDROIDTheme {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            containerColor = Color.Black,
+            bottomBar = { BottomNav(navController = navController) }
+        ) { innerPadding ->
+            CompositionLocalProvider(LocalContentColor provides Color.White) {
+                NavGraph(
+                    navController = navController,
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
         }
-        item { BannerSection() }
-
-        // 필수 섹션
-        item { SectionWithRow(title = "오늘의 티빙 TOP 20") }
-        item { SectionWithRow(title = "지금 방영 중인 콘텐츠") }
     }
 }
 
@@ -241,14 +222,18 @@ fun SectionWithRow(title: String) {
 
 @Preview(showBackground = true)
 @Composable
-fun HomeScreenPreview() {
+fun TivingPreview() {
     ATSOPTANDROIDTheme {
+        val navController = rememberNavController()
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             containerColor = Color.Black,
-            bottomBar = { BottomNav() }
+            bottomBar = { BottomNav(navController = navController) }
         ) { innerPadding ->
-            HomeScreen(modifier = Modifier.padding(innerPadding))
+            NavGraph(
+                navController = navController,
+                modifier = Modifier.padding(innerPadding)
+            )
         }
     }
 }
