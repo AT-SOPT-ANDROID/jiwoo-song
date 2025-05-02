@@ -13,6 +13,7 @@ import org.sopt.at.TvingTopBar
 import org.sopt.at.component.CategoryTab
 import org.sopt.at.BannerSection
 import org.sopt.at.SectionWithRow
+import org.sopt.at.ui.theme.TivingTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -30,7 +31,15 @@ fun HomeScreen(modifier: Modifier = Modifier, navController: NavHostController) 
         item { BannerSection() }
 
         // 필수 섹션
-        item { SectionWithRow(title = "오늘의 티빙 TOP 20") }
-        item { SectionWithRow(title = "지금 방영 중인 콘텐츠") }
+        item {
+            SectionWithRow(
+                title = "오늘의 티빙 TOP 20"
+            )
+        }
+        item {
+            SectionWithRow(
+                title = "지금 방영 중인 콘텐츠"
+            )
+        }
     }
 }

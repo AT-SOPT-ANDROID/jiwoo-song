@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sopt.at.component.BottomNav
 import org.sopt.at.component.CategoryTab
-import org.sopt.at.ui.theme.ATSOPTANDROIDTheme
 import org.sopt.atsoptandroid.MyActivity
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavHostController
@@ -37,6 +36,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontStyle
 import org.sopt.at.navigation.NavGraph
+import org.sopt.at.ui.theme.TivingTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,7 +83,7 @@ fun TvingTopBar() {
 fun HomeScreenWrapper() {
     val navController = rememberNavController()
 
-    ATSOPTANDROIDTheme {
+    TivingTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             containerColor = Color.Black,
@@ -113,10 +113,10 @@ fun CategoryTab() {
         categories.forEachIndexed { index, title ->
             Text(
                 text = title,
-                modifier = Modifier
-                    .clickable { selectedIndex = index },
-                fontWeight = if (selectedIndex == index) FontWeight.Bold else FontWeight.Normal,
-                color = if (selectedIndex == index) Color.White else Color.Gray
+                modifier = Modifier.clickable { selectedIndex = index },
+                color = if (selectedIndex == index) Color.White else Color.Gray,
+                fontSize = 18.sp,
+                fontWeight = if (selectedIndex == index) FontWeight.Bold else FontWeight.Normal
             )
         }
     }
@@ -155,8 +155,17 @@ fun SectionWithRow(title: String) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            Text(text = "더보기", modifier = Modifier.padding(end = 16.dp), color = Color.White)
+            Text(
+                text = title,
+                style = TivingTheme.typography.title,
+                color = TivingTheme.colors.basicWhite
+            )
+            Text(
+                text = "더보기",
+                style = TivingTheme.typography.caption,
+                color = TivingTheme.colors.gray01,
+                modifier = Modifier.padding(end = 16.dp)
+            )
         }
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             if (title == "오늘의 티빙 TOP 20") {
@@ -188,9 +197,9 @@ fun SectionWithRow(title: String) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "${index + 1}",
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
                                 color = Color.White,
-                                fontSize = 40.sp,
-                                fontWeight = FontWeight.Black,
                                 fontStyle = FontStyle.Italic,
                                 modifier = Modifier
                                     .padding(end = 4.dp)
@@ -223,7 +232,7 @@ fun SectionWithRow(title: String) {
 @Preview(showBackground = true)
 @Composable
 fun TivingPreview() {
-    ATSOPTANDROIDTheme {
+    TivingTheme {
         val navController = rememberNavController()
         Scaffold(
             modifier = Modifier.fillMaxSize(),

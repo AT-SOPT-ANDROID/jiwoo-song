@@ -20,14 +20,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sopt.at.R
-import org.sopt.at.ui.theme.ATSOPTANDROIDTheme
+import org.sopt.at.ui.theme.TivingTheme
 
 class MyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ATSOPTANDROIDTheme {
+            TivingTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     MyActivityContent(
                         modifier = Modifier.padding(innerPadding),
@@ -99,7 +99,7 @@ fun MyActivityContent(
 @Preview(showBackground = true)
 @Composable
 fun MyActivityPreview() {
-    ATSOPTANDROIDTheme {
+    TivingTheme {
         MyActivityContent(onBackClick = {})
     }
 }

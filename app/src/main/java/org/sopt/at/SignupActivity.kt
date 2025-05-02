@@ -27,14 +27,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.sopt.at.ui.theme.ATSOPTANDROIDTheme
+import org.sopt.at.ui.theme.TivingTheme
 
 class SignupActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ATSOPTANDROIDTheme {
+            TivingTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
                     SignupFlow(this)
                 }
@@ -295,7 +295,7 @@ fun validatePassword(password: String): Boolean {
 @Preview(showBackground = true)
 @Composable
 fun SignupPreview() {
-    ATSOPTANDROIDTheme {
+    TivingTheme {
         class TempActivity : ComponentActivity()
         SignupFlow(TempActivity())
     }

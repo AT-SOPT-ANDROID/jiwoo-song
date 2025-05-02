@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.sopt.at.ui.theme.ATSOPTANDROIDTheme
+import org.sopt.at.ui.theme.TivingTheme
 
 @Composable
 fun CategoryTab(modifier: Modifier = Modifier) {
@@ -41,7 +41,7 @@ fun CategoryTab(modifier: Modifier = Modifier) {
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 fun CategoryTabPreview() {
-    ATSOPTANDROIDTheme {
+    TivingTheme {
         CategoryTab()
     }
 }

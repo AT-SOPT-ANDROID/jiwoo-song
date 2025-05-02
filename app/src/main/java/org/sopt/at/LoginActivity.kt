@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import org.sopt.at.R
-import org.sopt.at.ui.theme.ATSOPTANDROIDTheme
+import org.sopt.at.ui.theme.TivingTheme
 
 class LoginViewModel : ViewModel() {
     var savedUserId by mutableStateOf("")
@@ -52,7 +52,7 @@ class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ATSOPTANDROIDTheme {
+            TivingTheme {
                 LoginScreen(
                     viewModel = viewModel,
                     onLoginClick = { inputId, inputPwd ->
@@ -200,7 +200,7 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 fun LoginPreview() {
-    ATSOPTANDROIDTheme {
+    TivingTheme {
         LoginScreen(
             viewModel = LoginViewModel(),
             onLoginClick = { _, _ -> },
