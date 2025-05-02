@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,6 +35,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontStyle
 import org.sopt.at.navigation.NavGraph
 import org.sopt.at.ui.theme.TivingTheme
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,8 +51,8 @@ fun TvingTopBar() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.tving_logo),
+                StableImage(
+                    drawableResId = R.drawable.tving_logo,
                     contentDescription = "TVING Logo",
                     modifier = Modifier
                         .height(28.dp)
@@ -62,8 +62,8 @@ fun TvingTopBar() {
                     val intent = Intent(context, MyActivity::class.java)
                     context.startActivity(intent)
                 }) {
-                    Image(
-                        painter = painterResource(id = R.drawable.profile),
+                    StableImage(
+                        drawableResId = R.drawable.profile,
                         contentDescription = "My Page",
                         modifier = Modifier.size(50.dp)
                     )
@@ -125,8 +125,8 @@ fun CategoryTab() {
 @Composable
 fun BannerSection() {
     Box(modifier = Modifier.fillMaxWidth()) {
-        Image(
-            painter = painterResource(id = R.drawable.img_20),
+        StableImage(
+            drawableResId = R.drawable.img_20,
             contentDescription = "Mock Banner",
             modifier = Modifier
                 .fillMaxWidth()
@@ -205,9 +205,8 @@ fun SectionWithRow(title: String) {
                                     .padding(end = 4.dp)
                                     .offset(y = (40).dp)
                             )
-                            Image(
-                                painter = painterResource(id = resId),
-                                contentDescription = null,
+                            StableImage(
+                                drawableResId = resId,
                                 modifier = Modifier
                                     .size(width = 120.dp, height = 180.dp)
                             )
@@ -217,9 +216,8 @@ fun SectionWithRow(title: String) {
             } else {
                 items(imageList.size) { index ->
                     val imageResId = imageList.getOrNull(index) ?: android.R.drawable.ic_menu_gallery
-                    Image(
-                        painter = painterResource(id = imageResId),
-                        contentDescription = null,
+                    StableImage(
+                        drawableResId = imageResId,
                         modifier = Modifier
                             .size(width = 120.dp, height = 180.dp)
                     )
@@ -245,4 +243,20 @@ fun TivingPreview() {
             )
         }
     }
+}
+
+@Composable
+fun StableImage(
+    modifier: Modifier = Modifier,
+    drawableResId: Int,
+    contentDescription: String = "",
+    contentScale: ContentScale = ContentScale.Fit
+) {
+    val painter = painterResource(id = drawableResId)
+    Image(
+        painter = painter,
+        contentDescription = contentDescription,
+        modifier = modifier,
+        contentScale = contentScale
+    )
 }
