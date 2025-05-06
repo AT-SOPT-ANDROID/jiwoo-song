@@ -37,6 +37,9 @@ import org.sopt.at.navigation.NavGraph
 import org.sopt.at.ui.theme.TivingTheme
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import org.sopt.at.ui.theme.TivingAppTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,8 +54,11 @@ fun TvingTopBar() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                StableImage(
-                    drawableResId = R.drawable.tving_logo,
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(R.drawable.tving_logo)
+                        .crossfade(true)
+                        .build(),
                     contentDescription = "TVING Logo",
                     modifier = Modifier
                         .height(28.dp)
@@ -62,8 +68,11 @@ fun TvingTopBar() {
                     val intent = Intent(context, MyActivity::class.java)
                     context.startActivity(intent)
                 }) {
-                    StableImage(
-                        drawableResId = R.drawable.profile,
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(R.drawable.profile)
+                            .crossfade(true)
+                            .build(),
                         contentDescription = "My Page",
                         modifier = Modifier.size(50.dp)
                     )
@@ -83,7 +92,7 @@ fun TvingTopBar() {
 fun HomeScreenWrapper() {
     val navController = rememberNavController()
 
-    TivingTheme {
+    TivingAppTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             containerColor = Color.Black,
@@ -157,12 +166,12 @@ fun SectionWithRow(title: String) {
         ) {
             Text(
                 text = title,
-                style = TivingTheme.typography.title,
+                style = TivingTheme.typography.title1.b24,
                 color = TivingTheme.colors.basicWhite
             )
             Text(
                 text = "더보기",
-                style = TivingTheme.typography.caption,
+                style = TivingTheme.typography.body1.r16,
                 color = TivingTheme.colors.gray01,
                 modifier = Modifier.padding(end = 16.dp)
             )
@@ -230,7 +239,7 @@ fun SectionWithRow(title: String) {
 @Preview(showBackground = true)
 @Composable
 fun TivingPreview() {
-    TivingTheme {
+    TivingAppTheme {
         val navController = rememberNavController()
         Scaffold(
             modifier = Modifier.fillMaxSize(),

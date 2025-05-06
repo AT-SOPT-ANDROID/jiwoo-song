@@ -22,7 +22,7 @@ object TivingTheme {
         @ReadOnlyComposable
         get() = LocalTivingColorsProvider.current
 
-    val typography: TivingTypography
+    val typography: TypographyTokens
         @Composable
         @ReadOnlyComposable
         get() = LocalTivingTypographyProvider.current
@@ -31,7 +31,7 @@ object TivingTheme {
 @Composable
 fun ProvideTivingColorsAndTypography(
     colors: TivingColors,
-    typography: TivingTypography,
+    typography: TypographyTokens,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
@@ -42,12 +42,12 @@ fun ProvideTivingColorsAndTypography(
 }
 
 @Composable
-fun TivingTheme(
+fun TivingAppTheme(
     content: @Composable () -> Unit
 ) {
     ProvideTivingColorsAndTypography(
         colors = defaultTivingColors,
-        typography = defaultTivingTypography
+        typography = DefaultTypographyTokens()
     ) {
         val view = LocalView.current
         if (!view.isInEditMode) {
@@ -57,8 +57,6 @@ fun TivingTheme(
                 }
             }
         }
-        MaterialTheme(
-            content = content
-        )
+        MaterialTheme(content = content)
     }
 }

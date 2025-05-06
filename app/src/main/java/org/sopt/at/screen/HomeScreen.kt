@@ -13,7 +13,6 @@ import org.sopt.at.TvingTopBar
 import org.sopt.at.component.CategoryTab
 import org.sopt.at.BannerSection
 import org.sopt.at.SectionWithRow
-import org.sopt.at.ui.theme.TivingTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable

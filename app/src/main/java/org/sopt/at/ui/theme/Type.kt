@@ -8,45 +8,70 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import org.sopt.at.R
 
-val tivingBold = FontFamily(Font(R.font.pretendard_bold))
-val tivingSemiBold = FontFamily(Font(R.font.pretendard_semibold))
-val tivingRegular = FontFamily(Font(R.font.pretendard_regular))
+object PretendardFont {
+    val Bold = FontFamily(Font(R.font.pretendard_bold))
+    val SemiBold = FontFamily(Font(R.font.pretendard_semibold))
+    val Regular = FontFamily(Font(R.font.pretendard_regular))
+}
+
+sealed interface TypographyTokens {
+    val title1: Title1
+    val body1: Body1
+}
 
 @Immutable
-data class TivingTypography(
-    val title: TextStyle,
-    val subTitle: TextStyle,
-    val body: TextStyle,
-    val button: TextStyle,
-    val caption: TextStyle,
+data class Title1(
+    val b24: TextStyle,
+    val m24: TextStyle,
+    val r24: TextStyle
 )
 
-val defaultTivingTypography = TivingTypography(
-    title = TextStyle(
-        fontFamily = tivingBold,
-        fontSize = 24.sp,
-        lineHeight = 32.sp
-    ),
-    subTitle = TextStyle(
-        fontFamily = tivingSemiBold,
-        fontSize = 18.sp,
-        lineHeight = 26.sp
-    ),
-    body = TextStyle(
-        fontFamily = tivingRegular,
-        fontSize = 16.sp,
-        lineHeight = 24.sp
-    ),
-    button = TextStyle(
-        fontFamily = tivingBold,
-        fontSize = 14.sp,
-        lineHeight = 20.sp
-    ),
-    caption = TextStyle(
-        fontFamily = tivingRegular,
-        fontSize = 12.sp,
-        lineHeight = 16.sp
-    ),
+@Immutable
+data class Body1(
+    val b16: TextStyle,
+    val m16: TextStyle,
+    val r16: TextStyle
 )
 
-val LocalTivingTypographyProvider = staticCompositionLocalOf { defaultTivingTypography }
+
+class DefaultTypographyTokens : TypographyTokens {
+    override val title1 = Title1(
+        b24 = TextStyle(
+            fontFamily = PretendardFont.Bold,
+            fontSize = 24.sp,
+            lineHeight = 32.sp
+        ),
+        m24 = TextStyle(
+            fontFamily = PretendardFont.SemiBold,
+            fontSize = 24.sp,
+            lineHeight = 32.sp
+        ),
+        r24 = TextStyle(
+            fontFamily = PretendardFont.Regular,
+            fontSize = 24.sp,
+            lineHeight = 32.sp
+        )
+    )
+
+    override val body1 = Body1(
+        b16 = TextStyle(
+            fontFamily = PretendardFont.Bold,
+            fontSize = 16.sp,
+            lineHeight = 24.sp
+        ),
+        m16 = TextStyle(
+            fontFamily = PretendardFont.SemiBold,
+            fontSize = 16.sp,
+            lineHeight = 24.sp
+        ),
+        r16 = TextStyle(
+            fontFamily = PretendardFont.Regular,
+            fontSize = 16.sp,
+            lineHeight = 24.sp
+        )
+    )
+}
+
+val LocalTivingTypographyProvider = staticCompositionLocalOf<TypographyTokens> {
+    DefaultTypographyTokens()
+}
