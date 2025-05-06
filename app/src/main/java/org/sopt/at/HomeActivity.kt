@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,14 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sopt.at.component.BottomNav
 import org.sopt.at.component.CategoryTab
-import org.sopt.at.ui.theme.ATSOPTANDROIDTheme
 import org.sopt.atsoptandroid.MyActivity
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavHostController
@@ -37,6 +34,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontStyle
 import org.sopt.at.navigation.NavGraph
+import org.sopt.at.ui.theme.TivingTheme
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import org.sopt.at.ui.theme.TivingAppTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,8 +54,11 @@ fun TvingTopBar() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.tving_logo),
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(R.drawable.tving_logo)
+                        .crossfade(true)
+                        .build(),
                     contentDescription = "TVING Logo",
                     modifier = Modifier
                         .height(28.dp)
@@ -62,8 +68,11 @@ fun TvingTopBar() {
                     val intent = Intent(context, MyActivity::class.java)
                     context.startActivity(intent)
                 }) {
-                    Image(
-                        painter = painterResource(id = R.drawable.profile),
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(R.drawable.profile)
+                            .crossfade(true)
+                            .build(),
                         contentDescription = "My Page",
                         modifier = Modifier.size(50.dp)
                     )
@@ -83,7 +92,7 @@ fun TvingTopBar() {
 fun HomeScreenWrapper() {
     val navController = rememberNavController()
 
-    ATSOPTANDROIDTheme {
+    TivingAppTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             containerColor = Color.Black,
@@ -113,10 +122,10 @@ fun CategoryTab() {
         categories.forEachIndexed { index, title ->
             Text(
                 text = title,
-                modifier = Modifier
-                    .clickable { selectedIndex = index },
-                fontWeight = if (selectedIndex == index) FontWeight.Bold else FontWeight.Normal,
-                color = if (selectedIndex == index) Color.White else Color.Gray
+                modifier = Modifier.clickable { selectedIndex = index },
+                color = if (selectedIndex == index) Color.White else Color.Gray,
+                fontSize = 18.sp,
+                fontWeight = if (selectedIndex == index) FontWeight.Bold else FontWeight.Normal
             )
         }
     }
@@ -125,8 +134,8 @@ fun CategoryTab() {
 @Composable
 fun BannerSection() {
     Box(modifier = Modifier.fillMaxWidth()) {
-        Image(
-            painter = painterResource(id = R.drawable.img_20),
+        StableImage(
+            drawableResId = R.drawable.img_20,
             contentDescription = "Mock Banner",
             modifier = Modifier
                 .fillMaxWidth()
@@ -155,8 +164,17 @@ fun SectionWithRow(title: String) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            Text(text = "더보기", modifier = Modifier.padding(end = 16.dp), color = Color.White)
+            Text(
+                text = title,
+                style = TivingTheme.typography.title1.b24,
+                color = TivingTheme.colors.basicWhite
+            )
+            Text(
+                text = "더보기",
+                style = TivingTheme.typography.body1.r16,
+                color = TivingTheme.colors.gray01,
+                modifier = Modifier.padding(end = 16.dp)
+            )
         }
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             if (title == "오늘의 티빙 TOP 20") {
@@ -188,17 +206,16 @@ fun SectionWithRow(title: String) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "${index + 1}",
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
                                 color = Color.White,
-                                fontSize = 40.sp,
-                                fontWeight = FontWeight.Black,
                                 fontStyle = FontStyle.Italic,
                                 modifier = Modifier
                                     .padding(end = 4.dp)
                                     .offset(y = (40).dp)
                             )
-                            Image(
-                                painter = painterResource(id = resId),
-                                contentDescription = null,
+                            StableImage(
+                                drawableResId = resId,
                                 modifier = Modifier
                                     .size(width = 120.dp, height = 180.dp)
                             )
@@ -208,9 +225,8 @@ fun SectionWithRow(title: String) {
             } else {
                 items(imageList.size) { index ->
                     val imageResId = imageList.getOrNull(index) ?: android.R.drawable.ic_menu_gallery
-                    Image(
-                        painter = painterResource(id = imageResId),
-                        contentDescription = null,
+                    StableImage(
+                        drawableResId = imageResId,
                         modifier = Modifier
                             .size(width = 120.dp, height = 180.dp)
                     )
@@ -223,7 +239,7 @@ fun SectionWithRow(title: String) {
 @Preview(showBackground = true)
 @Composable
 fun TivingPreview() {
-    ATSOPTANDROIDTheme {
+    TivingAppTheme {
         val navController = rememberNavController()
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -236,4 +252,20 @@ fun TivingPreview() {
             )
         }
     }
+}
+
+@Composable
+fun StableImage(
+    modifier: Modifier = Modifier,
+    drawableResId: Int,
+    contentDescription: String = "",
+    contentScale: ContentScale = ContentScale.Fit
+) {
+    val painter = painterResource(id = drawableResId)
+    Image(
+        painter = painter,
+        contentDescription = contentDescription,
+        modifier = modifier,
+        contentScale = contentScale
+    )
 }
