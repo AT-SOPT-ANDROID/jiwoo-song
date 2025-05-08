@@ -10,4 +10,5 @@
     <string name="title_activity_search_screen">SearchScreen</string>
     <string name="title_activity_history_screen">HistoryScreen</string>
     <string name="title_activity_home_screen">HomeScreen</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>

@@ -28,25 +28,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.sopt.at.ui.theme.TivingAppTheme
-import org.sopt.at.ui.theme.TivingTheme
 
-class SignupActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            TivingAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
-                    SignupFlow(this)
-                }
-            }
-        }
-    }
-}
+
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignupFlow(activity: ComponentActivity) {
+fun SignupScreen(navController: NavController) {
     var currentStep by remember { mutableStateOf(1) }
     var userId by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -58,7 +47,7 @@ fun SignupFlow(activity: ComponentActivity) {
                 navigationIcon = {
                     IconButton(onClick = {
                         if (currentStep == 1) {
-                            activity.finish()
+                            navController.popBackStack()
                         } else {
                             currentStep = 1
                         }
@@ -89,12 +78,9 @@ fun SignupFlow(activity: ComponentActivity) {
                     password = password,
                     onPasswordChanged = { password = it },
                     onComplete = {
-                        val resultIntent = Intent().apply {
-                            putExtra("USER_ID", userId)
-                            putExtra("PASSWORD", password)
-                        }
-                        activity.setResult(RESULT_OK, resultIntent)
-                        activity.finish()
+                        navController.previousBackStackEntry?.savedStateHandle?.set("USER_ID", userId)
+                        navController.previousBackStackEntry?.savedStateHandle?.set("PASSWORD", password)
+                        navController.popBackStack()
                     }
                 )
             }
@@ -297,7 +283,7 @@ fun validatePassword(password: String): Boolean {
 @Composable
 fun SignupPreview() {
     TivingAppTheme {
-        class TempActivity : ComponentActivity()
-        SignupFlow(TempActivity())
+        val navController = rememberNavController()
+        SignupScreen(navController = navController)
     }
 }

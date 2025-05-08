@@ -1,10 +1,5 @@
 package org.sopt.atsoptandroid
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -19,32 +14,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import org.sopt.at.R
 import org.sopt.at.ui.theme.TivingAppTheme
-import org.sopt.at.ui.theme.TivingTheme
-
-class MyActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            TivingAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MyActivityContent(
-                        modifier = Modifier.padding(innerPadding),
-                        onBackClick = { finish() }
-                    )
-                }
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyActivityContent(
+fun MyPageScreen(
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit
+    navController: NavController
 ) {
     val email = "user@example.com"
     Scaffold(
@@ -52,7 +31,7 @@ fun MyActivityContent(
             TopAppBar(
                 title = { },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
@@ -99,8 +78,8 @@ fun MyActivityContent(
 
 @Preview(showBackground = true)
 @Composable
-fun MyActivityPreview() {
+fun MyPagePreview() {
     TivingAppTheme {
-        MyActivityContent(onBackClick = {})
+        MyPageScreen(navController = rememberNavController())
     }
 }
