@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import org.sopt.at.R
+import org.sopt.at.ui.theme.TivingAppTheme
 import org.sopt.at.ui.theme.TivingTheme
 
 class LoginViewModel : ViewModel() {
@@ -52,7 +53,7 @@ class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TivingTheme {
+            TivingAppTheme {
                 LoginScreen(
                     viewModel = viewModel,
                     onLoginClick = { inputId, inputPwd ->
@@ -200,7 +201,7 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 fun LoginPreview() {
-    TivingTheme {
+    TivingAppTheme {
         LoginScreen(
             viewModel = LoginViewModel(),
             onLoginClick = { _, _ -> },

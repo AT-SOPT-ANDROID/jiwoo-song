@@ -42,6 +42,15 @@ import coil.request.ImageRequest
 import org.sopt.at.ui.theme.TivingAppTheme
 
 
+class HomeActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            HomeScreenWrapper()
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TvingTopBar() {
