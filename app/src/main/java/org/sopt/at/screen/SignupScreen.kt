@@ -89,8 +89,8 @@ fun SignupScreen(navController: NavController) {
                     nickname = nickname,
                     onNicknameChanged = { nickname = it },
                     onComplete = {
-                        navController.previousBackStackEntry?.savedStateHandle?.set("USER_ID", userId)
-                        navController.previousBackStackEntry?.savedStateHandle?.set("PASSWORD", password)
+                        navController.previousBackStackEntry?.savedStateHandle?.set("userId", userId)
+                        navController.previousBackStackEntry?.savedStateHandle?.set("userPwd", password)
                         navController.previousBackStackEntry?.savedStateHandle?.set("NICKNAME", nickname)
                         navController.popBackStack()
                     }
@@ -365,17 +365,27 @@ fun NicknameInputScreen(
     }
 }
 
+//fun validateUserId(userId: String): Boolean {
+//    return userId.length in 6..12 &&
+//            userId.first().isLowerCase() &&
+//            userId.all { it.isLowerCase() || it.isDigit() }
+//}
 fun validateUserId(userId: String): Boolean {
-    return userId.length in 6..12 &&
-            userId.first().isLowerCase() &&
-            userId.all { it.isLowerCase() || it.isDigit() }
+    return userId.length in 8..20 &&
+            userId.all { it.isLetterOrDigit() }
 }
 
+//fun validatePassword(password: String): Boolean {
+//    return password.length in 8..15 &&
+//            password.any { it.isLetter() } &&
+//            password.any { it.isDigit() } &&
+//            password.any { "~!@#$%^&*".contains(it) }
+//}
 fun validatePassword(password: String): Boolean {
-    return password.length in 8..15 &&
+    return password.length in 8..20 &&
             password.any { it.isLetter() } &&
             password.any { it.isDigit() } &&
-            password.any { "~!@#$%^&*".contains(it) }
+            password.all { it.isLetterOrDigit() }
 }
 
 fun validateNickname(nickname: String): Boolean {

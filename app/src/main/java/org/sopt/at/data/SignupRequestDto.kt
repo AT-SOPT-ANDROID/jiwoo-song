@@ -1,7 +1,12 @@
 package org.sopt.at.data
 
+import kotlinx.serialization.SerialName
+
 data class SignupRequestDto(
-    val loginId: String,
+    @SerialName("loginId")
+    val userId: String,
+    @SerialName("nickname")
     val nickname: String,
+    @SerialName("password")
     val password: String
 )

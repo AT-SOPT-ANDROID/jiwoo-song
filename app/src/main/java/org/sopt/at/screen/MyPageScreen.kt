@@ -109,7 +109,10 @@ fun MyPageScreen(
                             val userService = ServicePool.userService
                             CoroutineScope(Dispatchers.IO).launch {
                                 try {
-                                    val response = userService.updateNickname(UpdateNicknameRequestDto(newNickname))
+                                    val response = userService.updateNickname(
+                                        userId = 1234,
+                                        request = UpdateNicknameRequestDto(newNickname)
+                                    )
                                     if (response.isSuccessful) {
                                         withContext(Dispatchers.Main) {
                                             nicknameState.value = newNickname
