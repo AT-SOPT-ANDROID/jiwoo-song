@@ -19,7 +19,6 @@ import org.sopt.at.navigation.TivingApp
 import org.sopt.at.ui.screen.HomeScreen
 import org.sopt.at.ui.theme.TivingAppTheme
 import org.sopt.atsoptandroid.LoginScreen
-import org.sopt.atsoptandroid.LoginViewModel
 import org.sopt.atsoptandroid.MyPageScreen
 import org.sopt.atsoptandroid.SignupScreen
 

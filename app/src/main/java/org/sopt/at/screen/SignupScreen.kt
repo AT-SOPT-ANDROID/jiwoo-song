@@ -32,6 +32,7 @@ import org.sopt.at.ui.theme.TivingAppTheme
 
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import org.sopt.at.api.ServicePool
 
 enum class Step {
     ID, PASSWORD, NICKNAME

@@ -1,6 +1,10 @@
 package org.sopt.atsoptandroid
 
+import kotlinx.coroutines.*
 import android.util.Log
+import org.sopt.at.api.ServicePool
+import org.sopt.at.data.LoginRequestDto
+
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,19 +23,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import org.sopt.at.R
 import org.sopt.at.ui.theme.TivingAppTheme
 
-class LoginViewModel : ViewModel() {
-    var savedUserId by mutableStateOf("")
-    var savedPassword by mutableStateOf("")
-}
-
 @Composable
-fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
+fun LoginScreen(navController: NavController) {
     var textId by remember { mutableStateOf("") }
     var textPwd by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -110,19 +108,38 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
             Spacer(modifier = Modifier.height(10.dp))
             Button(
                 onClick = {
-                    val trimmedId = textId.trim()
-                    val trimmedPwd = textPwd.trim()
-                    Log.d("Login", "Comparing: $trimmedId/${viewModel.savedUserId}, $trimmedPwd/${viewModel.savedPassword}")
-                    when {
-                        trimmedId.isEmpty() || trimmedPwd.isEmpty() -> {
-                            Toast.makeText(context, "아이디와 비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
-                        }
-                        trimmedId == viewModel.savedUserId && trimmedPwd == viewModel.savedPassword -> {
-                            Toast.makeText(context, "로그인 성공!", Toast.LENGTH_SHORT).show()
-                            navController.navigate("home")
-                        }
-                        else -> {
-                            Toast.makeText(context, "로그인 실패: 정보 불일치", Toast.LENGTH_SHORT).show()
+                    val userService = ServicePool.userService
+                    val userId = textId.trim()
+                    val userPwd = textPwd.trim()
+
+                    if (userId.isEmpty() || userPwd.isEmpty()) {
+                        Toast.makeText(context, "아이디와 비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val loginRequest = LoginRequestDto(userId, userPwd)
+                            val response = userService.login(loginRequest)
+
+                            if (response.isSuccessful) {
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(context, "로그인 성공!", Toast.LENGTH_SHORT).show()
+
+                                    navController.navigate("home") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                }
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(context, "로그인 실패: 정보 불일치", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("Login", "Login failed: ${e.message}")
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, "네트워크 오류 발생", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 },
@@ -162,8 +179,7 @@ fun LoginPreview() {
     TivingAppTheme {
         val navController = rememberNavController()
         LoginScreen(
-            navController = navController,
-            viewModel = LoginViewModel()
+            navController = navController
         )
     }
 }
