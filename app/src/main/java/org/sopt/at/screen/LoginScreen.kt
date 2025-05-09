@@ -110,16 +110,16 @@ fun LoginScreen(navController: NavController) {
                 onClick = {
                     val userService = ServicePool.userService
                     val userId = textId.trim()
-                    val userPwd = textPwd.trim()
+                    val password = textPwd.trim()
 
-                    if (userId.isEmpty() || userPwd.isEmpty()) {
+                    if (userId.isEmpty() || password.isEmpty()) {
                         Toast.makeText(context, "아이디와 비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
                         return@Button
                     }
 
                     CoroutineScope(Dispatchers.IO).launch {
                         try {
-                            val loginRequest = LoginRequestDto(userId, userPwd)
+                            val loginRequest = LoginRequestDto(userId, password)
                             val response = userService.login(loginRequest)
 
                             if (response.isSuccessful) {
