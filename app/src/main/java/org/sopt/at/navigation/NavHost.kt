@@ -29,7 +29,7 @@ fun TivingApp() {
         }
 
         composable("mypage") {
-            MyPageScreen(navController = navController)
+            MyPageScreen(navController = navController, nickname = "로딩 중...")
         }
     }
 }

@@ -1,11 +1,16 @@
 package org.sopt.atsoptandroid
 
+import kotlinx.coroutines.*
+import android.util.Log
+import org.sopt.at.api.ServicePool
+import org.sopt.at.data.UpdateNicknameRequestDto
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,9 +28,11 @@ import org.sopt.at.ui.theme.TivingAppTheme
 @Composable
 fun MyPageScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    nickname: String
 ) {
-    val email = "user@example.com"
+    val nicknameState = remember { mutableStateOf(nickname) }
+    var isDialogOpen by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -65,13 +72,66 @@ fun MyPageScreen(
                     contentDescription = "Profile Image",
                     modifier = Modifier.size(100.dp)
                 )
-                Text(
-                    text = email,
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = nicknameState.value,
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        IconButton(onClick = { isDialogOpen = true }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.icon_pencil),
+                                contentDescription = "닉네임 수정",
+                                tint = Color.White
+                            )
+                        }
+                    }
+                }
             }
+        }
+        if (isDialogOpen) {
+            var newNickname by remember { mutableStateOf("") }
+            AlertDialog(
+                onDismissRequest = { isDialogOpen = false }, //모달창 닫힘 처리
+                title = { Text("새 닉네임을 입력해주세요") },
+                text = {
+                    OutlinedTextField(
+                        value = newNickname,
+                        onValueChange = { newNickname = it },
+                        label = { Text("새 닉네임") }
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            val userService = ServicePool.userService
+                            CoroutineScope(Dispatchers.IO).launch {
+                                try {
+                                    val response = userService.updateNickname(UpdateNicknameRequestDto(newNickname))
+                                    if (response.isSuccessful) {
+                                        withContext(Dispatchers.Main) {
+                                            nicknameState.value = newNickname
+                                            isDialogOpen = false
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("NicknameUpdate", "Update failed: ${e.message}")
+                                }
+                            }
+                        }
+                    ) {
+                        Text("확인")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { isDialogOpen = false }) {
+                        Text("취소")
+                    }
+                },
+                containerColor = Color.White
+            )
         }
     }
 }
@@ -80,6 +140,6 @@ fun MyPageScreen(
 @Composable
 fun MyPagePreview() {
     TivingAppTheme {
-        MyPageScreen(navController = rememberNavController())
+        MyPageScreen(navController = rememberNavController(), nickname = "SampleNickname")
     }
 }

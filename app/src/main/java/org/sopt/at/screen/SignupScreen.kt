@@ -33,12 +33,17 @@ import org.sopt.at.ui.theme.TivingAppTheme
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
+enum class Step {
+    ID, PASSWORD, NICKNAME
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignupScreen(navController: NavController) {
-    var currentStep by remember { mutableStateOf(1) }
+    var currentStep by remember { mutableStateOf(Step.ID) }
     var userId by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var nickname by remember { mutableStateOf("") }
     val context = LocalContext.current
     Scaffold(
         topBar = {
@@ -46,10 +51,10 @@ fun SignupScreen(navController: NavController) {
                 title = { },
                 navigationIcon = {
                     IconButton(onClick = {
-                        if (currentStep == 1) {
-                            navController.popBackStack()
-                        } else {
-                            currentStep = 1
+                        when (currentStep) {
+                            Step.ID -> navController.popBackStack()
+                            Step.PASSWORD -> currentStep = Step.ID
+                            Step.NICKNAME -> currentStep = Step.PASSWORD
                         }
                     }) {
                         Icon(
@@ -69,17 +74,23 @@ fun SignupScreen(navController: NavController) {
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             when (currentStep) {
-                1 -> IdInputScreen(
+                Step.ID -> IdInputScreen(
                     userId = userId,
                     onUserIdChanged = { userId = it },
-                    onNextClicked = { currentStep = 2 }
+                    onNextClicked = { currentStep = Step.PASSWORD }
                 )
-                2 -> PasswordInputScreen(
+                Step.PASSWORD -> PasswordInputScreen(
                     password = password,
                     onPasswordChanged = { password = it },
+                    onNextClicked = { currentStep = Step.NICKNAME }
+                )
+                Step.NICKNAME -> NicknameInputScreen(
+                    nickname = nickname,
+                    onNicknameChanged = { nickname = it },
                     onComplete = {
                         navController.previousBackStackEntry?.savedStateHandle?.set("USER_ID", userId)
                         navController.previousBackStackEntry?.savedStateHandle?.set("PASSWORD", password)
+                        navController.previousBackStackEntry?.savedStateHandle?.set("NICKNAME", nickname)
                         navController.popBackStack()
                     }
                 )
@@ -175,7 +186,7 @@ fun IdInputScreen(
 fun PasswordInputScreen(
     password: String,
     onPasswordChanged: (String) -> Unit,
-    onComplete: () -> Unit
+    onNextClicked: () -> Unit
 ) {
     val context = LocalContext.current
     val isValidPassword = validatePassword(password)
@@ -245,7 +256,94 @@ fun PasswordInputScreen(
                         Toast.makeText(context, "비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
                     !isValidPassword ->
                         Toast.makeText(context, "조건을 확인해주세요", Toast.LENGTH_SHORT).show()
-                    isValidPassword -> onComplete()
+                    isValidPassword -> onNextClicked()
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .border(
+                    width = 1.dp,
+                    color = Color.White,
+                    shape = RoundedCornerShape(4.dp)
+                ),
+            shape = RoundedCornerShape(4.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Black
+            )
+        ) {
+            Text("다음", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+fun NicknameInputScreen(
+    nickname: String,
+    onNicknameChanged: (String) -> Unit,
+    onComplete: () -> Unit
+) {
+    val context = LocalContext.current
+    val isValidNickname = validateNickname(nickname)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text = "닉네임을 입력해주세요.",
+                fontSize = 24.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+            TextField(
+                value = nickname,
+                onValueChange = onNicknameChanged,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF262626), RoundedCornerShape(4.dp)),
+                placeholder = { Text("닉네임", color = Color(0xFFB3B3B3)) },
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    cursorColor = Color.White,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "한글, 영문, 숫자 조합 2~10자리",
+                color = Color(0xFFB3B3B3),
+                fontSize = 12.sp
+            )
+        }
+        Button(
+            onClick = {
+                when {
+                    nickname.isEmpty() ->
+                        Toast.makeText(context, "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
+                    !isValidNickname ->
+                        Toast.makeText(
+                            context,
+                            "닉네임이 유효하지 않습니다. 한글/영문/숫자 2~10자로 입력해주세요.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    isValidNickname -> {
+                        Toast.makeText(context, "회원가입 완료!", Toast.LENGTH_SHORT).show()
+                        onComplete()
+                    }
                 }
             },
             modifier = Modifier
@@ -277,6 +375,11 @@ fun validatePassword(password: String): Boolean {
             password.any { it.isLetter() } &&
             password.any { it.isDigit() } &&
             password.any { "~!@#$%^&*".contains(it) }
+}
+
+fun validateNickname(nickname: String): Boolean {
+    return nickname.length in 2..10 &&
+            nickname.all { it.isLetterOrDigit() || (it.toInt() in 0xAC00..0xD7A3) }
 }
 
 @Preview(showBackground = true)
