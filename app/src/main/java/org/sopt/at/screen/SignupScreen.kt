@@ -3,6 +3,7 @@ package org.sopt.atsoptandroid
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,7 +33,14 @@ import org.sopt.at.ui.theme.TivingAppTheme
 
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.sopt.at.api.ServicePool
+import org.sopt.at.data.LoginRequestDto
+import org.sopt.at.data.SignupRequestDto
+import org.sopt.at.data.SignupResponseDto
 
 enum class Step {
     ID, PASSWORD, NICKNAME
@@ -86,6 +94,8 @@ fun SignupScreen(navController: NavController) {
                     onNextClicked = { currentStep = Step.NICKNAME }
                 )
                 Step.NICKNAME -> NicknameInputScreen(
+                    userId = userId,
+                    password = password,
                     nickname = nickname,
                     onNicknameChanged = { nickname = it },
                     onComplete = {
@@ -280,6 +290,8 @@ fun PasswordInputScreen(
 
 @Composable
 fun NicknameInputScreen(
+    userId: String,
+    password: String,
     nickname: String,
     onNicknameChanged: (String) -> Unit,
     onComplete: () -> Unit
@@ -342,8 +354,29 @@ fun NicknameInputScreen(
                             Toast.LENGTH_SHORT
                         ).show()
                     isValidNickname -> {
-                        Toast.makeText(context, "회원가입 완료!", Toast.LENGTH_SHORT).show()
-                        onComplete()
+                        val userService = ServicePool.userService
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                val signUpRequest = SignupRequestDto(userId, nickname,password)
+                                val response = userService.signUp(signUpRequest)
+
+                                if (response.isSuccessful) {
+                                    withContext(Dispatchers.Main) {
+                                        onComplete()
+                                        Toast.makeText(context, "회원가입 성공!", Toast.LENGTH_SHORT).show()
+                                    }
+                                } else {
+                                    withContext(Dispatchers.Main) {
+                                        Toast.makeText(context, "회원가입 실패: 정보 불일치", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Log.e("SignUp", "Sign Up failed: ${e.message}")
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(context, "네트워크 오류 발생", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
                     }
                 }
             },

@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import android.util.Log
 import org.sopt.at.api.ServicePool
 import org.sopt.at.data.UpdateNicknameRequestDto
+import org.sopt.at.data.MyNicknameResponseDto
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -29,9 +30,24 @@ import org.sopt.at.ui.theme.TivingAppTheme
 fun MyPageScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    nickname: String
+    userId: Long
 ) {
-    val nicknameState = remember { mutableStateOf(nickname) }
+    val nicknameState = remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        val userService = ServicePool.userService
+        try {
+            val response = userService.getMyInfo(userId = userId)
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    nicknameState.value = body.data.nickname
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("NicknameFetch", "Fetch failed: ${e.message}")
+        }
+    }
     var isDialogOpen by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
@@ -110,7 +126,7 @@ fun MyPageScreen(
                             CoroutineScope(Dispatchers.IO).launch {
                                 try {
                                     val response = userService.updateNickname(
-                                        userId = 1234,
+                                        userId = userId,
                                         request = UpdateNicknameRequestDto(newNickname)
                                     )
                                     if (response.isSuccessful) {
@@ -143,6 +159,6 @@ fun MyPageScreen(
 @Composable
 fun MyPagePreview() {
     TivingAppTheme {
-        MyPageScreen(navController = rememberNavController(), nickname = "SampleNickname")
+        MyPageScreen(navController = rememberNavController(), userId = 390L)
     }
 }

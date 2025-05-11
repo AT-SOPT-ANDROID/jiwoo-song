@@ -26,7 +26,7 @@ fun TivingApp() {
         }
 
         composable("mypage") {
-            MyPageScreen(navController = navController, nickname = "로딩 중...")
+            MyPageScreen(navController = navController, userId = 390L) // 실제 userId 사용
         }
     }
 }
