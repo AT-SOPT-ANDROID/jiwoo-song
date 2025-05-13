@@ -1,13 +1,11 @@
 package org.sopt.atsoptandroid
 
-import android.content.Intent
-import android.os.Bundle
+import kotlinx.coroutines.*
 import android.util.Log
+import org.sopt.at.api.ServicePool
+import org.sopt.at.data.LoginRequestDto
+
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,69 +23,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import org.sopt.at.R
-import org.sopt.at.ui.theme.TivingTheme
-
-class LoginViewModel : ViewModel() {
-    var savedUserId by mutableStateOf("")
-    var savedPassword by mutableStateOf("")
-}
-
-class LoginActivity : ComponentActivity() {
-    private val viewModel: LoginViewModel by viewModels()
-    private val signupLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            result.data?.let { intent ->
-                viewModel.savedUserId = intent.getStringExtra("USER_ID")?.trim() ?: ""
-                viewModel.savedPassword = intent.getStringExtra("PASSWORD")?.trim() ?: ""
-                Log.d("Login", "Received data: ${viewModel.savedUserId}/${viewModel.savedPassword}")
-                Toast.makeText(this, "회원가입 완료! 로그인해주세요.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            TivingTheme {
-                LoginScreen(
-                    viewModel = viewModel,
-                    onLoginClick = { inputId, inputPwd ->
-                        val context = this
-                        val trimmedId = inputId.trim()
-                        val trimmedPwd = inputPwd.trim()
-                        Log.d("Login", "Comparing: $trimmedId/${viewModel.savedUserId}, $trimmedPwd/${viewModel.savedPassword}")
-                        when {
-                            trimmedId.isEmpty() || trimmedPwd.isEmpty() -> {
-                                Toast.makeText(context, "아이디와 비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
-                            }
-                            trimmedId == viewModel.savedUserId && trimmedPwd == viewModel.savedPassword -> {
-                                Toast.makeText(context, "로그인 성공!", Toast.LENGTH_SHORT).show()
-                                context.startActivity(Intent(context, MyActivity::class.java))
-                            }
-                            else -> {
-                                Toast.makeText(context, "로그인 실패: 정보 불일치", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    },
-                    onSignupClick = {
-                        signupLauncher.launch(Intent(this, SignupActivity::class.java))
-                    }
-                )
-            }
-        }
-    }
-}
+import org.sopt.at.ui.theme.TivingAppTheme
 
 @Composable
-fun LoginScreen(
-    viewModel: LoginViewModel,
-    onLoginClick: (String, String) -> Unit,
-    onSignupClick: () -> Unit
-) {
+fun LoginScreen(navController: NavController) {
     var textId by remember { mutableStateOf("") }
     var textPwd by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -165,7 +107,42 @@ fun LoginScreen(
             )
             Spacer(modifier = Modifier.height(10.dp))
             Button(
-                onClick = { onLoginClick(textId, textPwd) },
+                onClick = {
+                    val userService = ServicePool.userService
+                    val userId = textId.trim()
+                    val password = textPwd.trim()
+
+                    if (userId.isEmpty() || password.isEmpty()) {
+                        Toast.makeText(context, "아이디와 비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val loginRequest = LoginRequestDto(userId, password)
+                            val response = userService.login(loginRequest)
+
+                            if (response.isSuccessful) {
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(context, "로그인 성공!", Toast.LENGTH_SHORT).show()
+
+                                    navController.navigate("home") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                }
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(context, "로그인 실패: 정보 불일치", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("Login", "Login failed: ${e.message}")
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, "네트워크 오류 발생", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp),
@@ -188,8 +165,7 @@ fun LoginScreen(
                     text = "회원가입",
                     color = Color.Gray,
                     modifier = Modifier.clickable {
-                        val intent = Intent(context, SignupActivity::class.java)
-                        context.startActivity(intent)
+                        navController.navigate("signup")
                     }
                 )
             }
@@ -200,11 +176,10 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 fun LoginPreview() {
-    TivingTheme {
+    TivingAppTheme {
+        val navController = rememberNavController()
         LoginScreen(
-            viewModel = LoginViewModel(),
-            onLoginClick = { _, _ -> },
-            onSignupClick = {}
+            navController = navController
         )
     }
 }

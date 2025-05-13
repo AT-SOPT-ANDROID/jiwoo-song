@@ -3,6 +3,7 @@ package org.sopt.atsoptandroid
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,28 +28,31 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.sopt.at.ui.theme.TivingTheme
+import org.sopt.at.ui.theme.TivingAppTheme
 
-class SignupActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            TivingTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
-                    SignupFlow(this)
-                }
-            }
-        }
-    }
+
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.sopt.at.api.ServicePool
+import org.sopt.at.data.LoginRequestDto
+import org.sopt.at.data.SignupRequestDto
+import org.sopt.at.data.SignupResponseDto
+
+enum class Step {
+    ID, PASSWORD, NICKNAME
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignupFlow(activity: ComponentActivity) {
-    var currentStep by remember { mutableStateOf(1) }
+fun SignupScreen(navController: NavController) {
+    var currentStep by remember { mutableStateOf(Step.ID) }
     var userId by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var nickname by remember { mutableStateOf("") }
     val context = LocalContext.current
     Scaffold(
         topBar = {
@@ -56,10 +60,10 @@ fun SignupFlow(activity: ComponentActivity) {
                 title = { },
                 navigationIcon = {
                     IconButton(onClick = {
-                        if (currentStep == 1) {
-                            activity.finish()
-                        } else {
-                            currentStep = 1
+                        when (currentStep) {
+                            Step.ID -> navController.popBackStack()
+                            Step.PASSWORD -> currentStep = Step.ID
+                            Step.NICKNAME -> currentStep = Step.PASSWORD
                         }
                     }) {
                         Icon(
@@ -79,21 +83,26 @@ fun SignupFlow(activity: ComponentActivity) {
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             when (currentStep) {
-                1 -> IdInputScreen(
+                Step.ID -> IdInputScreen(
                     userId = userId,
                     onUserIdChanged = { userId = it },
-                    onNextClicked = { currentStep = 2 }
+                    onNextClicked = { currentStep = Step.PASSWORD }
                 )
-                2 -> PasswordInputScreen(
+                Step.PASSWORD -> PasswordInputScreen(
                     password = password,
                     onPasswordChanged = { password = it },
+                    onNextClicked = { currentStep = Step.NICKNAME }
+                )
+                Step.NICKNAME -> NicknameInputScreen(
+                    userId = userId,
+                    password = password,
+                    nickname = nickname,
+                    onNicknameChanged = { nickname = it },
                     onComplete = {
-                        val resultIntent = Intent().apply {
-                            putExtra("USER_ID", userId)
-                            putExtra("PASSWORD", password)
-                        }
-                        activity.setResult(RESULT_OK, resultIntent)
-                        activity.finish()
+                        navController.previousBackStackEntry?.savedStateHandle?.set("userId", userId)
+                        navController.previousBackStackEntry?.savedStateHandle?.set("userPwd", password)
+                        navController.previousBackStackEntry?.savedStateHandle?.set("NICKNAME", nickname)
+                        navController.popBackStack()
                     }
                 )
             }
@@ -188,7 +197,7 @@ fun IdInputScreen(
 fun PasswordInputScreen(
     password: String,
     onPasswordChanged: (String) -> Unit,
-    onComplete: () -> Unit
+    onNextClicked: () -> Unit
 ) {
     val context = LocalContext.current
     val isValidPassword = validatePassword(password)
@@ -258,7 +267,117 @@ fun PasswordInputScreen(
                         Toast.makeText(context, "비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
                     !isValidPassword ->
                         Toast.makeText(context, "조건을 확인해주세요", Toast.LENGTH_SHORT).show()
-                    isValidPassword -> onComplete()
+                    isValidPassword -> onNextClicked()
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .border(
+                    width = 1.dp,
+                    color = Color.White,
+                    shape = RoundedCornerShape(4.dp)
+                ),
+            shape = RoundedCornerShape(4.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Black
+            )
+        ) {
+            Text("다음", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+fun NicknameInputScreen(
+    userId: String,
+    password: String,
+    nickname: String,
+    onNicknameChanged: (String) -> Unit,
+    onComplete: () -> Unit
+) {
+    val context = LocalContext.current
+    val isValidNickname = validateNickname(nickname)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text = "닉네임을 입력해주세요.",
+                fontSize = 24.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+            TextField(
+                value = nickname,
+                onValueChange = onNicknameChanged,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF262626), RoundedCornerShape(4.dp)),
+                placeholder = { Text("닉네임", color = Color(0xFFB3B3B3)) },
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    cursorColor = Color.White,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "한글, 영문, 숫자 조합 2~10자리",
+                color = Color(0xFFB3B3B3),
+                fontSize = 12.sp
+            )
+        }
+        Button(
+            onClick = {
+                when {
+                    nickname.isEmpty() ->
+                        Toast.makeText(context, "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
+                    !isValidNickname ->
+                        Toast.makeText(
+                            context,
+                            "닉네임이 유효하지 않습니다. 한글/영문/숫자 2~10자로 입력해주세요.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    isValidNickname -> {
+                        val userService = ServicePool.userService
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                val signUpRequest = SignupRequestDto(userId, nickname,password)
+                                val response = userService.signUp(signUpRequest)
+
+                                if (response.isSuccessful) {
+                                    withContext(Dispatchers.Main) {
+                                        onComplete()
+                                        Toast.makeText(context, "회원가입 성공!", Toast.LENGTH_SHORT).show()
+                                    }
+                                } else {
+                                    withContext(Dispatchers.Main) {
+                                        Toast.makeText(context, "회원가입 실패: 정보 불일치", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Log.e("SignUp", "Sign Up failed: ${e.message}")
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(context, "네트워크 오류 발생", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
                 }
             },
             modifier = Modifier
@@ -279,24 +398,39 @@ fun PasswordInputScreen(
     }
 }
 
+//fun validateUserId(userId: String): Boolean {
+//    return userId.length in 6..12 &&
+//            userId.first().isLowerCase() &&
+//            userId.all { it.isLowerCase() || it.isDigit() }
+//}
 fun validateUserId(userId: String): Boolean {
-    return userId.length in 6..12 &&
-            userId.first().isLowerCase() &&
-            userId.all { it.isLowerCase() || it.isDigit() }
+    return userId.length in 8..20 &&
+            userId.all { it.isLetterOrDigit() }
 }
 
+//fun validatePassword(password: String): Boolean {
+//    return password.length in 8..15 &&
+//            password.any { it.isLetter() } &&
+//            password.any { it.isDigit() } &&
+//            password.any { "~!@#$%^&*".contains(it) }
+//}
 fun validatePassword(password: String): Boolean {
-    return password.length in 8..15 &&
+    return password.length in 8..20 &&
             password.any { it.isLetter() } &&
             password.any { it.isDigit() } &&
-            password.any { "~!@#$%^&*".contains(it) }
+            password.all { it.isLetterOrDigit() }
+}
+
+fun validateNickname(nickname: String): Boolean {
+    return nickname.length in 2..10 &&
+            nickname.all { it.isLetterOrDigit() || (it.toInt() in 0xAC00..0xD7A3) }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun SignupPreview() {
-    TivingTheme {
-        class TempActivity : ComponentActivity()
-        SignupFlow(TempActivity())
+    TivingAppTheme {
+        val navController = rememberNavController()
+        SignupScreen(navController = navController)
     }
 }
